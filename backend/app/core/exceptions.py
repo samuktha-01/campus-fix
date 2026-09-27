@@ -20,12 +20,26 @@ class AppException(HTTPException):
         )
 
 
+class BadRequestException(AppException):
+    def __init__(self, message: str = "Bad request payload", details: Optional[Any] = None):
+        super().__init__(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            code="BAD_REQUEST",
+            message=message,
+            details=details,
+        )
+
+
 class NotFoundException(AppException):
-    def __init__(self, resource: str, resource_id: Any):
+    def __init__(self, resource_or_message: str = "Resource not found", resource_id: Optional[Any] = None):
+        if resource_id is not None:
+            msg = f"{resource_or_message} with id '{resource_id}' was not found"
+        else:
+            msg = resource_or_message
         super().__init__(
             status_code=status.HTTP_404_NOT_FOUND,
             code="NOT_FOUND",
-            message=f"{resource} with id '{resource_id}' was not found",
+            message=msg,
         )
 
 

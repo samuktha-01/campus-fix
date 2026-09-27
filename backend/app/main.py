@@ -1,11 +1,15 @@
 """SmartCampus AI FastAPI application entrypoint."""
 
+import os
 import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
+
 from app.api.v1.api import api_router
+from app.api.v1.endpoints.tickets import router as tickets_router
 from app.core.config import settings
 from app.core.database import Base, engine
 from app.core.exceptions import AppException
@@ -16,6 +20,10 @@ logging.basicConfig(
     format="%(asctime)s - [%(levelname)s] - %(name)s: %(message)s",
 )
 logger = logging.getLogger("smartcampus")
+
+# Uploads directory
+UPLOADS_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "uploads"))
+os.makedirs(UPLOADS_DIR, exist_ok=True)
 
 
 @asynccontextmanager
@@ -79,8 +87,14 @@ async def generic_exception_handler(request: Request, exc: Exception):
     )
 
 
+# Static files mount for ticket photo and video attachments
+app.mount("/uploads", StaticFiles(directory=UPLOADS_DIR), name="uploads")
+
 # Mount API V1
 app.include_router(api_router, prefix=settings.API_V1_STR)
+
+# Also mount /api/tickets directly to strictly satisfy POST /api/tickets and GET /api/tickets/my
+app.include_router(tickets_router, prefix="/api/tickets", tags=["Tickets (Direct /api)"])
 
 
 @app.get("/", tags=["Root"])
@@ -90,4 +104,5 @@ async def root():
         "message": f"Welcome to {settings.PROJECT_NAME} API v{settings.VERSION}",
         "documentation": "/docs",
         "health": f"{settings.API_V1_STR}/health",
+        "tickets_api": "/api/tickets",
     }

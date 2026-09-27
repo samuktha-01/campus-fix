@@ -14,55 +14,111 @@ export interface User {
 export interface Department {
   id: string;
   name: string;
-  code: string;
+  code?: string;
   description?: string;
+  contact_email?: string;
   headId?: string;
-  isActive: boolean;
+  isActive?: boolean;
 }
 
-export interface Category {
+export interface PriorityFactors {
+  severity_score: number;
+  affected_users_score: number;
+  safety_score: number;
+  location_score: number;
+  recurrence_score: number;
+  sla_risk_score: number;
+  final_score: number;
+  created_at?: string;
+}
+
+export interface SLATracking {
+  response_deadline: string;
+  resolution_deadline: string;
+  response_completed_at?: string | null;
+  resolution_completed_at?: string | null;
+  sla_status: SLAStatus;
+  escalation_level: number;
+  time_remaining_hours?: number;
+  is_breached?: boolean;
+  formatted_resolution_deadline?: string;
+}
+
+export interface DuplicateMatch {
+  matched_ticket_id: string;
+  matched_ticket_number: string;
+  matched_title: string;
+  matched_status: string;
+  matched_location?: string;
+  similarity_score: number;
+  relationship_type: string;
+  created_at: string;
+}
+
+export interface TicketAttachment {
   id: string;
-  departmentId: string;
-  name: string;
-  description?: string;
-  defaultPriority: TicketPriority;
-  defaultSlaHours: number;
+  file_url: string;
+  file_type: string;
+  created_at: string;
+}
+
+export interface TicketStatusHistory {
+  id: string;
+  old_status: string;
+  new_status: string;
+  changed_by?: string;
+  actor_name?: string;
+  actor_role?: string;
+  comment?: string;
+  created_at: string;
 }
 
 export interface Ticket {
   id: string;
-  ticketNumber: string;
-  studentId: string;
-  departmentId: string;
-  categoryId: string;
+  ticket_number: string;
   title: string;
   description: string;
+  category: string;
+  subcategory?: string | null;
   location: string;
-  status: TicketStatus;
   priority: TicketPriority;
-  aiCategoryConfidence?: number;
-  aiPriorityExplanation?: string;
-  isDuplicate: boolean;
-  parentTicketId?: string;
-  duplicateSimilarityScore?: number;
-  assignedStaffId?: string;
-  slaTargetHours: number;
-  slaDueAt: string;
-  slaStatus: SLAStatus;
-  resolvedAt?: string;
-  createdAt: string;
-  updatedAt: string;
+  priority_score?: number | null;
+  status: TicketStatus;
+  created_by: string;
+  creator_name?: string;
+  creator_email?: string;
+  assigned_department?: string | null;
+  department?: Department | null;
+  assigned_staff?: string | null;
+  assigned_staff_name?: string | null;
+  created_at: string;
+  updated_at: string;
+  resolved_at?: string | null;
+  closed_at?: string | null;
+
+  // Rich AI & SLA metadata
+  priority_factors?: PriorityFactors | null;
+  sla_tracking?: SLATracking | null;
+  duplicate_matches?: DuplicateMatch[];
+  attachments?: TicketAttachment[];
+  status_history?: TicketStatusHistory[];
 }
 
-export interface TicketActivity {
-  id: string;
-  ticketId: string;
-  actorId: string;
-  action: string;
-  oldValue?: Record<string, unknown>;
-  newValue?: Record<string, unknown>;
-  note?: string;
-  createdAt: string;
+export interface AIInsights {
+  confidence: number;
+  reasoning: string;
+  is_emergency: boolean;
+  detected_department: string;
+  suggested_category: string;
+  suggested_subcategory: string;
+}
+
+export interface TicketSubmissionResult {
+  success: boolean;
+  message: string;
+  ticket: Ticket;
+  duplicate_warning?: string | null;
+  ai_insights?: AIInsights | null;
 }
 
 export interface StudentFeedback {
