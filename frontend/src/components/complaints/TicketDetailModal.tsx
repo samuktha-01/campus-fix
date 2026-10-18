@@ -12,7 +12,8 @@ import {
   Play,
   Sparkles,
 } from 'lucide-react';
-import { ticketApi } from '../../lib/api';
+// Ticket API client and diagnostic utilities
+import { ticketApi, extractErrorMessage } from '../../lib/api';
 import { Ticket } from '../../types';
 import { PRIORITY_CONFIG, SLA_STATUS_CONFIG } from '../../lib/constants';
 
@@ -46,11 +47,7 @@ export const TicketDetailModal: React.FC<TicketDetailModalProps> = ({
       const data = await ticketApi.getTicketDetails(ticketNumber);
       setTicket(data);
     } catch (err: any) {
-      setError(
-        err.response?.data?.error?.message ||
-        err.response?.data?.detail ||
-        'Failed to load ticket details.'
-      );
+      setError(extractErrorMessage(err, 'Failed to load ticket details.'));
     } finally {
       setIsLoading(false);
     }
@@ -72,7 +69,7 @@ export const TicketDetailModal: React.FC<TicketDetailModalProps> = ({
       await fetchTicket();
       if (onTicketUpdated) onTicketUpdated();
     } catch (err: any) {
-      setError(err.response?.data?.error?.message || 'Failed to post comment.');
+      setError(extractErrorMessage(err, 'Failed to post comment.'));
     } finally {
       setIsSubmittingComment(false);
     }
@@ -90,7 +87,7 @@ export const TicketDetailModal: React.FC<TicketDetailModalProps> = ({
       await fetchTicket();
       if (onTicketUpdated) onTicketUpdated();
     } catch (err: any) {
-      setUploadError(err.response?.data?.error?.message || 'Failed to upload attachment.');
+      setUploadError(extractErrorMessage(err, 'Failed to upload attachment.'));
     } finally {
       setIsUploadingFile(false);
     }

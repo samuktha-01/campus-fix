@@ -10,6 +10,7 @@ from fastapi.staticfiles import StaticFiles
 
 from app.api.v1.api import api_router
 from app.api.v1.endpoints.tickets import router as tickets_router
+from app.api.v1.endpoints.auth import router as auth_router
 from app.core.config import settings
 from app.core.database import Base, engine
 from app.core.exceptions import AppException
@@ -93,8 +94,9 @@ app.mount("/uploads", StaticFiles(directory=UPLOADS_DIR), name="uploads")
 # Mount API V1
 app.include_router(api_router, prefix=settings.API_V1_STR)
 
-# Also mount /api/tickets directly to strictly satisfy POST /api/tickets and GET /api/tickets/my
+# Also mount /api/tickets and /api/auth directly to satisfy direct /api calls
 app.include_router(tickets_router, prefix="/api/tickets", tags=["Tickets (Direct /api)"])
+app.include_router(auth_router, prefix="/api/auth", tags=["Authentication (Direct /api)"])
 
 
 @app.get("/", tags=["Root"])

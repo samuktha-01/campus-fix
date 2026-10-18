@@ -14,7 +14,8 @@ import {
   Loader2,
   ChevronRight,
 } from 'lucide-react';
-import { ticketApi } from '../../lib/api';
+// Ticket API client and diagnostic utilities
+import { ticketApi, extractErrorMessage } from '../../lib/api';
 import { Ticket, TicketSubmissionResult } from '../../types';
 import { PRIORITY_CONFIG, SLA_STATUS_CONFIG } from '../../lib/constants';
 import { ComplaintForm } from '../../components/complaints/ComplaintForm';
@@ -50,11 +51,7 @@ export const StudentDashboard: React.FC = () => {
       const data = await ticketApi.getMyTickets();
       setTickets(data);
     } catch (err: any) {
-      setError(
-        err.response?.data?.error?.message ||
-        err.response?.data?.detail ||
-        'Unable to load your complaints from the server.'
-      );
+      setError(extractErrorMessage(err, 'Unable to load your complaints from the server.'));
     } finally {
       setIsLoading(false);
     }

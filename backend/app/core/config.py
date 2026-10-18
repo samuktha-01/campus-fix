@@ -26,7 +26,7 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
     # Database
-    DATABASE_URL: str = "postgresql+asyncpg://postgres:samsuresh22@localhost:5432/smartcampus_db"
+    DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/smartcampus_db"
 
     # CORS
     BACKEND_CORS_ORIGINS: List[str] = [

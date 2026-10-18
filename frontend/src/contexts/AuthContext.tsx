@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { apiClient } from '../lib/api';
+// API client and error extraction utilities
+import { apiClient, extractErrorMessage } from '../lib/api';
 import { UserProfile, TokenResponse, AuthContextType } from '../types/auth';
 import { UserRole } from '../lib/constants';
 
@@ -78,10 +79,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       return loggedInUser;
     } catch (err: any) {
-      const message =
-        err.response?.data?.error?.message ||
-        err.response?.data?.detail ||
-        'Authentication failed. Please check your credentials.';
+      const message = extractErrorMessage(err, 'Authentication failed. Please check your credentials.');
       setError(message);
       throw new Error(message);
     } finally {
@@ -110,10 +108,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       return registeredUser;
     } catch (err: any) {
-      const message =
-        err.response?.data?.error?.message ||
-        err.response?.data?.detail?.[0]?.msg ||
-        'Registration failed. Please check your inputs.';
+      const message = extractErrorMessage(err, 'Registration failed. Please check your inputs.');
       setError(message);
       throw new Error(message);
     } finally {

@@ -13,7 +13,8 @@ import {
   Clock,
   Loader2,
 } from 'lucide-react';
-import { ticketApi } from '../../lib/api';
+// Ticket API service and error extractor
+import { ticketApi, extractErrorMessage } from '../../lib/api';
 import { TicketSubmissionResult } from '../../types';
 
 interface ComplaintFormProps {
@@ -170,10 +171,10 @@ export const ComplaintForm: React.FC<ComplaintFormProps> = ({ onSuccess, onCance
       clearTimeout(stepTimer2);
       setIsSubmitting(false);
       setSubmitStep(0);
-      const msg =
-        err.response?.data?.error?.message ||
-        err.response?.data?.detail ||
-        'Failed to submit complaint. Please check your connection and try again.';
+      const msg = extractErrorMessage(
+        err,
+        'Failed to submit complaint. Please check your connection and try again.'
+      );
       setError(msg);
     }
   };
